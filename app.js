@@ -10,6 +10,8 @@ var express     = require("express"),
     Answer     = require("./models/answer"),
     User        = require("./models/user"),
     seedDB      = require("./seeds")    
+require('dotenv').config();
+const port = process.env.PORT || 3000;
 
 //requiring routes
 var answerRoutes    = require("./routes/answers"),
@@ -18,7 +20,15 @@ var answerRoutes    = require("./routes/answers"),
     userRoutes     =require("./routes/users")
 
 // seedDB(); seed the db
-mongoose.connect("mongodb://localhost/trivia_test_4", {useNewUrlParser: true, useUnifiedTopology: true});
+// mongoose.connect("mongodb://localhost/trivia_test_4", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+      console.log('Backend Started');
+    })
+    .catch(err => {
+        console.error('Backend error:', err.stack);
+        process.exit(1);
+    });
 app.use(bodyParser.urlencoded({extended: true}))
 app.set("view engine", "ejs")
 app.use(express.static(__dirname + "/public"));
@@ -49,6 +59,8 @@ app.use("/questions", questionRoutes);
 app.use("/questions/:id/answers", answerRoutes);
 app.use("/users", userRoutes)
 
-app.listen(3000, function(){
+app.listen(port, function(){
     console.log("Trivia Server Has Started!");
 });
+
+module.exports = app
